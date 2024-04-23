@@ -1,27 +1,27 @@
 package model;
-import java.util.ArrayList;
+
+import java.util.HashMap;
 
 public class Epic extends Task {
 
-    private final ArrayList<Integer> subTasks = new ArrayList<>();
+    private final HashMap<Integer, SubTask> subTasks = new HashMap<>();
 
-    public Epic(String name, String description) {
-        super(name, Status.NEW, description);
+    public Epic() {
     }
 
-    public Epic(int id, String name, Status status, String description) {
-        super(id, name, status, description);
-    }
-
-    public ArrayList<Integer> getSubTasks() {
+    public HashMap<Integer, SubTask> getSubTasks() {
         return subTasks;
     }
 
-    public void addSubTask(int id) {
-        subTasks.add(id);
+    public void addSubTask(SubTask subTask) {
+        subTasks.put(subTask.getId(), subTask);
     }
 
-    public void removeSubTask(Integer subTask) {
-        subTasks.remove(subTask);
+    public void deleteAllSubTasks() {
+        subTasks.clear();
+    }
+
+    public void removeSubTask(int ID) {
+        subTasks.remove(ID);
     }
 }

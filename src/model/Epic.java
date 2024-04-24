@@ -1,27 +1,37 @@
 package model;
-
-import java.util.HashMap;
+import java.util.ArrayList;
 
 public class Epic extends Task {
 
-    private final HashMap<Integer, SubTask> subTasks = new HashMap<>();
+    private final ArrayList<Integer> subTasks = new ArrayList<>();
 
-    public Epic() {
+    public Epic(String name, String description) {
+        super(name, Status.NEW, description);
     }
 
-    public HashMap<Integer, SubTask> getSubTasks() {
+    public Epic(int id, String name, String description) {
+//        Конструктор эпика не должен принимать на вход параметр со статусом, так как по ТЗ он задается автоматически на основе его подзадач.
+        super(id, name, Status.NEW, description);
+    }
+
+    public ArrayList<Integer> getSubTasks() {
         return subTasks;
     }
 
-    public void addSubTask(SubTask subTask) {
-        subTasks.put(subTask.getId(), subTask);
+    public void addSubTask(int id) {
+        subTasks.add(id);
     }
 
-    public void deleteAllSubTasks() {
-        subTasks.clear();
+    public void updateSubTask(SubTask subTask) {
+        for (Integer id : subTasks) {
+            if (id.equals(subTask.getId())) {
+                subTasks.remove(id);
+            }
+        }
+        subTasks.add(subTask.getId());
     }
 
-    public void removeSubTask(int ID) {
-        subTasks.remove(ID);
+    public void removeSubTask(Integer subTask) {
+        subTasks.remove(subTask);
     }
 }

@@ -13,7 +13,11 @@ public class Task {
         this.status = status;
         this.description = description;
     }
-    public Task() {
+
+    public Task(String name, Status status, String description) {
+        this.name = name;
+        this.status = status;
+        this.description = description;
     }
 
     public int getId() {
@@ -63,7 +67,7 @@ public class Task {
 
     @Override
     public String toString() {
-        return "Task {" +
+        return "Task{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", status=" + status +

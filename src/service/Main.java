@@ -11,58 +11,47 @@ public class Main {
 
     public static void main(String[] args) {
         TaskManager taskManager = new TaskManager();
+        taskManager.createTask(new Task("Заказать еду из СберМаркета", NEW, "1)Хлеб, 2)Соль."));
+        taskManager.createTask(new Task("Посетить театр", NEW, "Балет «Анна Каренина»"));
 
-        taskManager.createTask("Посетить театр", NEW, "Балет Анна Каренина");
-        taskManager.createTask("Посетить баню", NEW, "Мыло купить не забудем");
-        taskManager.createTask("Посетить ДНС", NEW, "Купим новый робот пылесос");
+        Epic Travel = taskManager.createEpic(new Epic("Поездка в Англию", "в Лондон"));
+        taskManager.createSubTask(new SubTask("Купить билеты", DONE, "На Январь 2025", Travel.getId()));
+        taskManager.createSubTask(new SubTask("Собрать чемодан", DONE, "задача выполнена 5 месяцев назад", Travel.getId()));
 
-        taskManager.createEpic("Поездка в Англию", "в Лондон");
-        taskManager.createEpic("Строим шалаш", "Строим шалаш из камыша, и жаренных гвоздей");
+        Epic Project = taskManager.createEpic(new Epic("Создать работающий проект", "5 спринт"));
+        taskManager.createSubTask(new SubTask("Сдать проект на первую проверку", NEW, "ожидать правки", Project.getId()));
 
-        taskManager.createSubTask(4, "Купить билеты", DONE, "На Январь 2025");
-        taskManager.createSubTask(4, "Купить носочки с бигбеном ", NEW, "Первостепенная задача");
-        taskManager.createSubTask(4, "Узнать где живет Ричард Хаммонд", NEW, "Второстепенная задача");
-
-        taskManager.createSubTask(5, "Гвозди", NEW, "Жарим на масле");
-        taskManager.createSubTask(5, "Камыш", NEW, "Ищем болото");
-
-        System.out.println("Все таски:");
         System.out.println(taskManager.getAllTasks());
-        System.out.println("Все эпики");
         System.out.println(taskManager.getAllEpics());
-        System.out.println("Все сабтаски");
         System.out.println(taskManager.getAllSubTasks());
-        System.out.println("Все сабстаски эпика 5");
-        System.out.println(taskManager.getSubTasksOfEpic(5));
-        System.out.println("___________________________");
-        System.out.println("Проверка удаления тасок 2 и 3");
-        taskManager.deleteTask(2);
-        taskManager.deleteTask(3);
-        System.out.println(taskManager.getAllTasks());
-        System.out.println("___________________________");
-        System.out.println("Проверка удаления эпика 4");
-        taskManager.deleteEpic(4);
-        System.out.println("все эпики");
+        System.out.println();
+
+        taskManager.updateEpic(new Epic(3, "Поездка в Беларусь>",  "в Минск"));
         System.out.println(taskManager.getAllEpics());
-        System.out.println("___________________________");
-        System.out.println("удалление сабтасок эпиков");
         System.out.println(taskManager.getAllSubTasks());
-        System.out.println("___________________________");
-        System.out.println("Проверка обновления таски");
-        taskManager.updateTask(1,"Театр скучно", "Сходили в лазер таг, поиграли", DONE);
+        System.out.println(taskManager.getSubTasksOfEpic(Project));
+        System.out.println();
+
+        taskManager.deleteTask(1);
+        taskManager.deleteSubTask(4);
+        taskManager.deleteSubTask(5);
+        taskManager.deleteEpic(3);
+
+        Epic Travel2 = taskManager.createEpic(new Epic("Подольск", "в ПОДОЛЬСК"));
+        taskManager.createSubTask(new SubTask("Купить деньги", IN_PROGRESS, "На Январь 2025", Travel2.getId()));
+        taskManager.createSubTask(new SubTask("Собрать сборы", DONE, "задача выполнена 5 месяцев назад", Travel2.getId()));
+        System.out.println("Tasks");
         System.out.println(taskManager.getAllTasks());
-        System.out.println("___________________________");
-        System.out.println("Проверка обновления эпика");
-        taskManager.updateEpic(5,"Шалаш строим 2-х этажный", "Докупим клей для шалаша");
+        System.out.println("epics");
         System.out.println(taskManager.getAllEpics());
-        System.out.println("___________________________");
-        System.out.println("Проверка обновления сабтаски 9 у эпика 5 ");
-        taskManager.updateSubTask(9,"Гвозди пожарены", DONE,"Есть неудобно");
-        System.out.println("удалление сабтасок по id");
-        taskManager.deleteSubTask(10);
-        System.out.println("___________________________");
-        System.out.println("Проверка обновления статуса у эпика 5 ");
-        System.out.println(taskManager.getSubTasksOfEpic(5));
-        System.out.println(taskManager.getAllEpics());
+        System.out.println("subtasks");
+        System.out.println(taskManager.getAllSubTasks());
+        System.out.println("______________");
+        taskManager.updateSubTask(new SubTask("341234 1234", DONE, "1234 2134 5 месяцев назад", Travel2.getId()), 9);
+        System.out.println(taskManager.getSubTasksOfEpic(Travel2));
+
+        System.out.println("______________");
+        taskManager.updateTask(2, new Task("Посетить театр", DONE, "Балет «Анна Каренина»"));
+        System.out.println(taskManager.getTask(2));
     }
 }

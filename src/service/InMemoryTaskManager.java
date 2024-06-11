@@ -176,4 +176,8 @@ public class InMemoryTaskManager implements TaskManager {
             epic.setStatus(DONE);
         }
     }
+
+    public ArrayList<Task> getHistory() {
+        return history.getHistory();
+    }
 }

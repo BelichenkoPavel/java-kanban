@@ -2,15 +2,20 @@ package service;
 
 import model.Status;
 import model.Task;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class InMemoryHistoryManagerTest {
+    InMemoryHistoryManager historyManager;
+
+    @BeforeEach
+    void setUp() {
+        historyManager = new InMemoryHistoryManager();
+    }
     @Test
     public void addToHistory() {
-        InMemoryHistoryManager historyManager = new InMemoryHistoryManager();
-
         assertEquals(0, historyManager.getHistory().size(), "Список истории должен быть пустым");
 
         Task task = new Task("Название задачи", Status.NEW, "Описание задачи");
@@ -20,9 +25,14 @@ class InMemoryHistoryManagerTest {
     }
 
     @Test
-    public void max10ElementsInHistory() {
-        InMemoryHistoryManager historyManager = new InMemoryHistoryManager();
+    public void tryAddNullToHistory() {
+        historyManager.add(null);
 
+        assertEquals(0, historyManager.getHistory().size(), "Список истории должен быть пустым");
+    }
+
+    @Test
+    public void max10ElementsInHistory() {
         for (int i = 0; i < 10; i++) {
             Task task = new Task("Задача " + i, Status.NEW, "Описание задачи");
             historyManager.add(task);

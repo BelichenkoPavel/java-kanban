@@ -4,6 +4,7 @@ import model.Epic;
 import model.Status;
 import model.SubTask;
 import model.Task;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -11,10 +12,15 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 class InMemoryTaskManagerTest {
+    InMemoryTaskManager taskManager;
+
+    @BeforeEach
+    void setUp() {
+        taskManager = new InMemoryTaskManager();
+    }
+
     @Test
     void addNewTask() {
-        InMemoryTaskManager taskManager = new InMemoryTaskManager();
-
         Task task = new Task("Название задачи", Status.NEW, "Описание задачи");
         assertEquals(0, taskManager.getAllTasks().size(), "Список задач должен быть пустым");
         taskManager.createTask(task);
@@ -31,8 +37,6 @@ class InMemoryTaskManagerTest {
 
     @Test
     void deleteTask() {
-        InMemoryTaskManager taskManager = new InMemoryTaskManager();
-
         Task deletedTask = new Task("Название задачи 2", Status.NEW, "Описание задачи");
         taskManager.createTask(new Task("Название задачи 1", Status.NEW, "Описание задачи"));
         taskManager.createTask(deletedTask);
@@ -45,8 +49,6 @@ class InMemoryTaskManagerTest {
 
     @Test
     void deleteAllTasks() {
-        InMemoryTaskManager taskManager = new InMemoryTaskManager();
-
         taskManager.createTask(new Task("Название задачи 1", Status.NEW, "Описание задачи"));
         taskManager.createTask(new Task("Название задачи 2", Status.NEW, "Описание задачи"));
 
@@ -58,8 +60,6 @@ class InMemoryTaskManagerTest {
 
     @Test
     void updateTask() {
-        InMemoryTaskManager taskManager = new InMemoryTaskManager();
-
         Task task = new Task(1, "Название задачи", Status.NEW, "Описание задачи");
         taskManager.createTask(task);
 
@@ -72,7 +72,6 @@ class InMemoryTaskManagerTest {
 
     @Test
     void addNewSubTask() {
-        InMemoryTaskManager taskManager = new InMemoryTaskManager();
         Epic epic = taskManager.createEpic(new Epic(1, "Создать работающий проект", "5 спринт"));
 
         SubTask subTask = new SubTask("Создать работающий проект", Status.IN_PROGRESS, "5 спринт", 1);
@@ -91,7 +90,6 @@ class InMemoryTaskManagerTest {
 
     @Test
     void deleteSubTask() {
-        InMemoryTaskManager taskManager = new InMemoryTaskManager();
         taskManager.createEpic(new Epic(1, "Создать работающий проект", "5 спринт"));
 
         SubTask subTask1 = new SubTask("Создать работающий проект", Status.DONE, "5 спринт", 1);
@@ -106,7 +104,6 @@ class InMemoryTaskManagerTest {
 
     @Test
     void deleteAllSubTasks() {
-        InMemoryTaskManager taskManager = new InMemoryTaskManager();
         taskManager.createEpic(new Epic(1, "Создать работающий проект", "5 спринт"));
 
         SubTask subTask1 = new SubTask("Создать работающий проект", Status.DONE, "5 спринт", 1);
@@ -121,7 +118,6 @@ class InMemoryTaskManagerTest {
 
     @Test
     void updateSubTask() {
-        InMemoryTaskManager taskManager = new InMemoryTaskManager();
         Epic epic = new Epic("Создать работающий проект", "5 спринт");
         taskManager.createEpic(epic);
         SubTask subTask = new SubTask("Название подзадачи", Status.NEW, "Описание задачи", epic.getId());
@@ -137,8 +133,6 @@ class InMemoryTaskManagerTest {
 
     @Test
     void addNewEpic() {
-        InMemoryTaskManager taskManager = new InMemoryTaskManager();
-
         Epic epic = new Epic("Создать работающий проект", "5 спринт");
         assertEquals(0, taskManager.getAllEpics().size(), "Список эпиков должен быть пустым");
         taskManager.createEpic(epic);
@@ -152,8 +146,6 @@ class InMemoryTaskManagerTest {
 
     @Test
     void deleteEpic() {
-        InMemoryTaskManager taskManager = new InMemoryTaskManager();
-
         Epic epic1 = new Epic("Создать работающий проект", "5 спринт");
         Epic epic2 = new Epic("Начать подготовку к 6 спринту", "6 спринт");
         taskManager.createEpic(epic1);
@@ -166,8 +158,6 @@ class InMemoryTaskManagerTest {
 
     @Test
     void deleteAllEpics() {
-        InMemoryTaskManager taskManager = new InMemoryTaskManager();
-
         Epic epic = new Epic("Создать работающий проект", "5 спринт");
         taskManager.createEpic(epic);
         assertEquals(1, taskManager.getAllEpics().size(), "Количество эпиков должно быть равным 1");
@@ -178,8 +168,6 @@ class InMemoryTaskManagerTest {
 
     @Test
     void updateEpic() {
-        InMemoryTaskManager taskManager = new InMemoryTaskManager();
-
         Epic epic = new Epic("Создать работающий проект", "5 спринт");
         taskManager.createEpic(epic);
 

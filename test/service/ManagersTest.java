@@ -1,20 +1,26 @@
 package service;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class ManagersTest {
+    Managers manager;
+
+    @BeforeEach
+    void setUp() {
+        manager = new Managers();
+    }
+
     @Test
     public void shouldTaskManagerExist() {
-        Managers manager = new Managers();
         TaskManager taskManager = manager.getDefault();
 
         assertNotNull(taskManager, "taskManager должен быть существовать");
     }
     @Test
     public void shouldHistoryManagerExist() {
-        Managers manager = new Managers();
         HistoryManager historyManager = manager.getDefaultHistory();
 
         assertNotNull(historyManager);

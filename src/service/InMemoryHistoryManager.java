@@ -8,6 +8,10 @@ public class InMemoryHistoryManager implements HistoryManager {
     private ArrayList<Task> history = new ArrayList<Task>();
 
     public void add(Task task) {
+        if (task == null) {
+            return;
+        }
+
         if (history.size() >= 10) {
             history.removeFirst();
         }
@@ -16,6 +20,6 @@ public class InMemoryHistoryManager implements HistoryManager {
     }
 
     public ArrayList<Task> getHistory() {
-       return history;
+       return new ArrayList<Task>(history);
     }
 }

@@ -36,6 +36,30 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
+    void getHistory() {
+        Task task1 = new Task(0, "Название задачи 1", Status.NEW, "Описание задачи");
+        Task task2 = new Task(1, "Название задачи 2", Status.IN_PROGRESS, "Описание задачи");
+        Task task3 = new Task(2, "Название задачи 3", Status.DONE, "Описание задачи");
+
+        // Создаем задачи
+        taskManager.createTask(task1);
+        taskManager.createTask(task2);
+        taskManager.createTask(task3);
+
+        // Просмартиваем задачи
+        taskManager.getTask(task1.getId());
+        taskManager.getTask(task2.getId());
+        taskManager.getTask(task3.getId());
+
+        assertArrayEquals(new Task[]{task1, task2, task3}, taskManager.getHistory().toArray(), "Задачи не совпадают");
+
+        // Повторно просмариваем задачу
+        taskManager.getTask(task2.getId());
+        assertArrayEquals(new Task[]{task1, task3, task2}, taskManager.getHistory().toArray(), "Задачи не совпадают");
+
+    }
+
+    @Test
     void deleteTask() {
         Task deletedTask = new Task("Название задачи 2", Status.NEW, "Описание задачи");
         taskManager.createTask(new Task("Название задачи 1", Status.NEW, "Описание задачи"));

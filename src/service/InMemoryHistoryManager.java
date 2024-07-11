@@ -13,6 +13,7 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     private Map<Integer, Node> history = new HashMap<>();
 
+    @Override
     public void add(Task task) {
         if (task == null) {
             return;
@@ -34,6 +35,7 @@ public class InMemoryHistoryManager implements HistoryManager {
         last = node;
     }
 
+    @Override
     public ArrayList<Task> getHistory() {
         ArrayList<Task> tasks = new ArrayList<>();
         Node current = first;

@@ -10,8 +10,15 @@ public class Main {
 
     public static void main(String[] args) {
         TaskManager inMemoryTaskManager = new Managers().getDefault();
-        inMemoryTaskManager.createTask(new Task("Заказать еду из СберМаркета", NEW, "1)Хлеб, 2)Соль."));
-        inMemoryTaskManager.createTask(new Task("Посетить театр", NEW, "Балет «Анна Каренина»"));
+        Task task1 = inMemoryTaskManager.createTask(new Task("Заказать еду из СберМаркета", NEW, "1)Хлеб, 2)Соль."));
+        Task task2 = inMemoryTaskManager.createTask(new Task("Посетить театр", NEW, "Балет «Анна Каренина»"));
+
+        System.out.println("Получить список задач");
+        System.out.println(inMemoryTaskManager.getTask(task1.getId()));
+        System.out.println(inMemoryTaskManager.getTask(task2.getId()));
+        System.out.println("Получить историю задач");
+        System.out.println(inMemoryTaskManager.getHistory());
+        System.out.println("______________");
 
         Epic travel = inMemoryTaskManager.createEpic(new Epic("Поездка в Англию", "в Лондон"));
         inMemoryTaskManager.createSubTask(new SubTask("Купить билеты", DONE, "На Январь 2025", travel.getId()));

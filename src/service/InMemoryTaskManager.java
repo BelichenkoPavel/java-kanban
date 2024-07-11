@@ -89,9 +89,11 @@ public class InMemoryTaskManager implements TaskManager {
         return subTask;
     }
 
-    public void createTask(Task task) {
+    public Task createTask(Task task) {
         task.setId(generateId());
         tasks.put(task.getId(), task);
+
+        return task;
     }
 
     public Epic createEpic(Epic epic) {

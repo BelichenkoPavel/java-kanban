@@ -21,7 +21,7 @@ public interface TaskManager {
 
     SubTask getSubTask(int id);
 
-    void createTask(Task task);
+    Task createTask(Task task);
 
     Epic createEpic(Epic epic);
 

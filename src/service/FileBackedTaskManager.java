@@ -1,11 +1,14 @@
 package service;
 
+import exceptions.ManagerSaveException;
 import model.*;
 import java.io.*;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
+    private static String fileName = "./data.csv";
+
     public void save() {
-        try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter("./data.csv"))) {
+        try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(fileName))) {
             bufferedWriter.write("id,type,name,status,description,epic\n");
 
             for (Task task : getAllTasks()) {
@@ -27,15 +30,15 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     public static FileBackedTaskManager loadFromFile() {
         FileBackedTaskManager manager = new FileBackedTaskManager();
 
-        try (BufferedReader br = new BufferedReader(new FileReader("./data.csv"))) {
+        try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
             br.readLine();
             while (br.ready()) {
                 String data = br.readLine();
                 Task task = manager.fromString(data);
 
-                if (task instanceof SubTask) {
+                if (task.getType() == TaskType.SUB_TASK) {
                     manager.addSubTask((SubTask) task);
-                } else if (task instanceof Epic) {
+                } else if (task.getType() == TaskType.EPIC) {
                     manager.addEpic((Epic) task);
                 } else {
                     manager.addTask(task);

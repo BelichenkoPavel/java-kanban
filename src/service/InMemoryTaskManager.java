@@ -11,9 +11,9 @@ import static model.Status.*;
 
 public class InMemoryTaskManager implements TaskManager {
 
-    private final HashMap<Integer, Task> tasks;
-    private final HashMap<Integer, Epic> epics;
-    private final HashMap<Integer, SubTask> subtasks;
+    protected final HashMap<Integer, Task> tasks;
+    protected final HashMap<Integer, Epic> epics;
+    protected final HashMap<Integer, SubTask> subtasks;
     private int numb = 0;
     private HistoryManager history = new Managers().getDefaultHistory();
 
@@ -162,7 +162,7 @@ public class InMemoryTaskManager implements TaskManager {
         calculateStatus(epic);
     }
 
-    private void calculateStatus(Epic epic) {
+    protected void calculateStatus(Epic epic) {
         if (epic.getSubTasks().isEmpty()) {
             epic.setStatus(NEW);
         }

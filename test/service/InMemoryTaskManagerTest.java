@@ -7,7 +7,10 @@ import model.Task;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.TreeSet;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -146,7 +149,7 @@ class InMemoryTaskManagerTest {
         taskManager.createEpic(epic);
         SubTask subTask = new SubTask("Название подзадачи", Status.NEW, "Описание задачи", epic.getId());
         taskManager.createSubTask(subTask);
-        epic.addSubTask(subTask.getId());
+        epic.addSubTask(subTask);
 
 
         SubTask updatedSubTask = new SubTask("Измененная подзадача", Status.IN_PROGRESS, "Доработанное описание задачи", 1);
@@ -200,5 +203,133 @@ class InMemoryTaskManagerTest {
         taskManager.updateEpic(updatedEpic);
 
         assertEquals(updatedEpic, taskManager.getEpic(epic.getId()));
+    }
+
+    @Test
+    void getPrioritizedTasks() {
+        LocalDateTime startDate = LocalDateTime.parse("2024-01-03T10:00:30");
+        Task task1 = new Task("Задача 1", Status.NEW, "Описание задачи 1", Duration.ofMinutes(30), startDate.plusHours(1));
+        Task task2 = new Task("Задача 2", Status.IN_PROGRESS, "Описание задачи 2", Duration.ofMinutes(10), startDate);
+        Task task3 = new Task("Задача 3", Status.DONE, "Описание задачи 3", Duration.ofMinutes(60), startDate.minusHours(1));
+        Task task4 = new Task("Задача без времени", Status.NEW, "Описание задачи 4");
+
+        taskManager.createTask(task1);
+        taskManager.createTask(task2);
+        taskManager.createTask(task3);
+        taskManager.createTask(task4);
+
+        TreeSet<Task> prioritizedTasks = taskManager.getPrioritizedTasks();
+        assertEquals(3, prioritizedTasks.size(), "Неверное количество приоритетных задач");
+
+        assertArrayEquals(prioritizedTasks.toArray(), new Task[]{task3, task2, task1}, "Неправильный порядок задач");
+
+        taskManager.deleteTask(task1.getId());
+        assertEquals(2, prioritizedTasks.size(), "Неверное количество приоритетных задач");
+    }
+
+    @Test
+    void checkEpicDuration() {
+        Epic epic = new Epic("Создать работающий проект", "8 спринт");
+        taskManager.createEpic(epic);
+
+        LocalDateTime startDate = LocalDateTime.parse("2024-01-03T10:00:02");
+
+        SubTask subTask2 = new SubTask("Задача 1", Status.IN_PROGRESS, "8 спринт", epic.getId(), Duration.ofMinutes(10), startDate.plusMinutes(30));
+        SubTask subTask1 = new SubTask("Задача 2", Status.DONE, "8 спринт", epic.getId(), Duration.ofMinutes(30), startDate);
+        SubTask subTask3 = new SubTask("Задача 3", Status.NEW, "8 спринт", epic.getId(), Duration.ofMinutes(10), startDate.plusMinutes(70));
+
+        taskManager.createSubTask(subTask1);
+        taskManager.createSubTask(subTask2);
+        taskManager.createSubTask(subTask3);
+        assertEquals(50, epic.getDuration().toMinutes(), "Длительность эпика не равна сумме подзадач");
+        assertEquals(startDate, epic.getStartTime(), "Дата начала эпика неправильная");
+        assertEquals(startDate.plusMinutes(80), epic.getEndTime(), "Дата окончания эпика неправильная");
+
+        taskManager.deleteSubTask(subTask1.getId());
+        assertEquals(20, epic.getDuration().toMinutes(), "Длительность эпика не равна сумме подзадач");
+        assertEquals(startDate.plusMinutes(30), epic.getStartTime(), "Дата начала эпика неправильная");
+        assertEquals(startDate.plusMinutes(80), epic.getEndTime(), "Дата окончания эпика неправильная");
+
+        taskManager.deleteAllSubTasks();
+        assertEquals(0, epic.getDuration().toMinutes(), "Длительность эпика не равна сумме подзадач");
+        assertNull(epic.getStartTime(), "Дата начала эпика неправильная");
+        assertNull(epic.getEndTime(), "Дата окончания эпика неправильная");
+    }
+
+    @Test
+    void checkTaskCollision() {
+        LocalDateTime startDate = LocalDateTime.parse("2024-01-03T10:00:00");
+
+        boolean collision = taskManager.isTaskCollideByDate(
+                new Task("Задача 1", Status.IN_PROGRESS, "Описание задачи 1", Duration.ofMinutes(10), startDate),
+                new Task("Задача 1", Status.IN_PROGRESS, "Описание задачи 1", Duration.ofMinutes(10), startDate)
+        );
+
+        assertTrue(collision, "Задачи не могут пересекаться по дате");
+
+        collision = taskManager.isTaskCollideByDate(
+                new Task("Задача 1", Status.IN_PROGRESS, "Описание задачи 1", Duration.ofMinutes(10), startDate),
+                new Task("Задача 1", Status.IN_PROGRESS, "Описание задачи 1", Duration.ofMinutes(10), startDate.plusMinutes(5))
+        );
+
+        assertTrue(collision, "Задачи не могут пересекаться по дате");
+
+        collision = taskManager.isTaskCollideByDate(
+                new Task("Задача 1", Status.IN_PROGRESS, "Описание задачи 1", Duration.ofMinutes(10), startDate.plusMinutes(5)),
+                new Task("Задача 1", Status.IN_PROGRESS, "Описание задачи 1", Duration.ofMinutes(10), startDate)
+        );
+
+        assertTrue(collision, "Задачи не могут пересекаться по дате");
+
+        collision = taskManager.isTaskCollideByDate(
+                new Task("Задача 1", Status.IN_PROGRESS, "Описание задачи 1", Duration.ofMinutes(10), startDate),
+                new Task("Задача 1", Status.IN_PROGRESS, "Описание задачи 1", Duration.ofMinutes(10), startDate.plusMinutes(10))
+        );
+
+        assertFalse(collision, "Задачи не пересекаются по дате");
+
+        collision = taskManager.isTaskCollideByDate(
+                new Task("Задача 1", Status.IN_PROGRESS, "Описание задачи 1", Duration.ofMinutes(10), startDate.plusMinutes(10)),
+                new Task("Задача 1", Status.IN_PROGRESS, "Описание задачи 1", Duration.ofMinutes(10), startDate)
+        );
+
+        assertFalse(collision, "Задачи не пересекаются по дате");
+
+        collision = taskManager.isTaskCollideByDate(
+                new Task("Задача 1", Status.IN_PROGRESS, "Описание задачи 1", Duration.ofMinutes(10), startDate),
+                new Task("Задача 1", Status.IN_PROGRESS, "Описание задачи 1", Duration.ofMinutes(10), startDate.plusMinutes(20))
+        );
+
+        assertFalse(collision, "Задачи не пересекаются по дате");
+
+        collision = taskManager.isTaskCollideByDate(
+                new Task("Задача 1", Status.IN_PROGRESS, "Описание задачи 1", Duration.ofMinutes(10), startDate.plusMinutes(20)),
+                new Task("Задача 1", Status.IN_PROGRESS, "Описание задачи 1", Duration.ofMinutes(10), startDate)
+        );
+
+        assertFalse(collision, "Задачи не пересекаются по дате");
+    }
+
+    @Test
+    void checkTaskCollisionError() {
+        Epic epic = new Epic("Создать работающий проект", "8 спринт");
+        taskManager.createEpic(epic);
+
+        LocalDateTime startDate = LocalDateTime.now();
+        Task task1 = new Task("Задача 1", Status.IN_PROGRESS, "Описание задачи 1", Duration.ofMinutes(10), startDate);
+        Task task2 = new Task("Задача 2", Status.IN_PROGRESS, "Описание задачи 2", Duration.ofMinutes(10), startDate.minusMinutes(5));
+        SubTask subTask1 = new SubTask("Задача 2", Status.DONE, "8 спринт", epic.getId(), Duration.ofMinutes(30), startDate.minusHours(1));
+        SubTask subTask2 = new SubTask("Задача 2", Status.DONE, "8 спринт", epic.getId(), Duration.ofMinutes(30), startDate.minusHours(1));
+
+        taskManager.createTask(task1);
+        taskManager.createSubTask(subTask1);
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            taskManager.createTask(task2);
+        }, "Задача не может пересекаться по дате");
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            taskManager.createSubTask(subTask2);
+        }, "Задача не может пересекаться по дате");
     }
 }

@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Test;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.TreeSet;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -218,13 +217,13 @@ class InMemoryTaskManagerTest {
         taskManager.createTask(task3);
         taskManager.createTask(task4);
 
-        TreeSet<Task> prioritizedTasks = taskManager.getPrioritizedTasks();
+        List<Task> prioritizedTasks = taskManager.getPrioritizedTasks();
         assertEquals(3, prioritizedTasks.size(), "Неверное количество приоритетных задач");
 
         assertArrayEquals(prioritizedTasks.toArray(), new Task[]{task3, task2, task1}, "Неправильный порядок задач");
 
         taskManager.deleteTask(task1.getId());
-        assertEquals(2, prioritizedTasks.size(), "Неверное количество приоритетных задач");
+        assertEquals(2, taskManager.getPrioritizedTasks().size(), "Неверное количество приоритетных задач");
     }
 
     @Test

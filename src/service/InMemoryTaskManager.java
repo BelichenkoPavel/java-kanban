@@ -6,10 +6,7 @@ import model.Task;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.TreeSet;
+import java.util.*;
 
 import static model.Status.*;
 
@@ -276,19 +273,13 @@ public class InMemoryTaskManager implements TaskManager {
         return history.getHistory();
     }
 
-    public TreeSet<Task> getPrioritizedTasks() {
-        return prioritizedTasks;
+    public List<Task> getPrioritizedTasks() {
+        return new ArrayList<>(prioritizedTasks);
     }
 
     public void checkCollideByDate(Task task) {
-        tasks.forEach((id, existTask) -> {
+        prioritizedTasks.stream().forEach((existTask) -> {
             if (isTaskCollideByDate(existTask, task)) {
-                throw new IllegalArgumentException("Нельзя добавлять задачу с пересечением по времени");
-            }
-        });
-
-        subtasks.forEach((id, subTask) -> {
-            if (isTaskCollideByDate(subTask, task)) {
                 throw new IllegalArgumentException("Нельзя добавлять задачу с пересечением по времени");
             }
         });

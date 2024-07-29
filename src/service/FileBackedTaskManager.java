@@ -3,25 +3,29 @@ package service;
 import exceptions.ManagerSaveException;
 import model.*;
 import java.io.*;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.Month;
+import java.util.function.Consumer;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
     private static String fileName = "./data.csv";
 
     public void save() {
         try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(fileName))) {
-            bufferedWriter.write("id,type,name,status,description,epic\n");
+            bufferedWriter.write("id,type,name,status,description,epic,duration,startTime\n");
 
-            for (Task task : getAllTasks()) {
-                bufferedWriter.write(toString(task));
-            }
+            Consumer<Task> taskConsumer = task -> {
+                try {
+                    bufferedWriter.write(toString(task));
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            };
 
-            for (Epic epic : getAllEpics()) {
-                bufferedWriter.write(toString(epic));
-            }
-
-            for (SubTask subtask : getAllSubTasks()) {
-                bufferedWriter.write(toString(subtask));
-            }
+            getAllTasks().stream().forEach(taskConsumer);
+            getAllEpics().stream().forEach(taskConsumer);
+            getAllSubTasks().stream().forEach(taskConsumer);
         } catch (IOException e) {
             throw new ManagerSaveException("Произошла ошибка во время сохранения");
         }
@@ -68,6 +72,8 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 + "," + task.getStatus()
                 + "," + task.getDescription()
                 + "," + epicId
+                + "," + task.getDuration()
+                + "," + task.getStartTime()
                 + "\n";
     }
 
@@ -78,21 +84,28 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         String name = values[2];
         Status status = Status.valueOf(values[3]);
         String description = values[4];
+        Duration duration = Duration.parse(values[6]);
+        LocalDateTime startTime = null;
+
+        if (!values[7].equals("null")) {
+            startTime = LocalDateTime.parse(values[7]);
+        }
+
 
         if (type == TaskType.SUB_TASK) {
             int epicId = Integer.parseInt(values[5]);
-            return new SubTask(id, name, status, description, epicId);
+            return new SubTask(id, name, status, description, epicId, duration, startTime);
         }
 
         if (type == TaskType.EPIC) {
-            return new Epic(id, name, status, description);
+            return new Epic(id, name, status, description, duration, startTime);
         }
 
-        return new Task(id, name, status, description);
+        return new Task(id, name, status, description, duration, startTime);
     }
 
     private Task addTask(Task task) {
-        tasks.put(task.getId(), task);;
+        tasks.put(task.getId(), task);
 
         return task;
     }
@@ -106,7 +119,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     private Task addSubTask(SubTask subTask) {
         subtasks.put(subTask.getId(), subTask);
         Epic epic = epics.get(subTask.getEpic());
-        epic.addSubTask(subTask.getId());
+        epic.addSubTask(subTask);
         calculateStatus(epic);
 
         return subTask;
@@ -194,6 +207,13 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         FileBackedTaskManager manager = new FileBackedTaskManager();
         manager.createTask(new Task("Проверить сохранение зачач в файл", Status.DONE, "Задачи должны сохраняться в файл"));
         manager.createTask(new Task("Проверить загрузку зачач из файла", Status.IN_PROGRESS, "Задачи должны быть загружены из файла"));
+        Task taskWithTime = new Task(
+                "Проверить сохранение задачи с временем",
+                Status.DONE,
+                "Задано время начала и продолжительность",
+                Duration.ofSeconds(12345678),
+                LocalDateTime.of(2024, Month.JULY, 25, 17, 22, 0));
+        manager.createTask(taskWithTime);
 
         Epic epic = new Epic("Написать тесты", "Проверить новый фнкционал");
         manager.createEpic(epic);

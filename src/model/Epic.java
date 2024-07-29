@@ -1,7 +1,11 @@
 package model;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 public class Epic extends Task {
+
+    private LocalDateTime endTime;
 
     private final ArrayList<Integer> subTasks = new ArrayList<>();
 
@@ -10,8 +14,8 @@ public class Epic extends Task {
     }
 
     // Конструктор для загрузки из файла
-    public Epic(int id, String name, Status status, String description) {
-        super(id, name, status, description);
+    public Epic(int id, String name, Status status, String description, Duration duration, LocalDateTime startTime) {
+        super(id, name, status, description, duration, startTime);
     }
 
     public Epic(int id, String name, String description) {
@@ -23,8 +27,21 @@ public class Epic extends Task {
         return subTasks;
     }
 
-    public void addSubTask(int id) {
-        subTasks.add(id);
+    public void addSubTask(SubTask subTask) {
+        duration = duration.plus(subTask.getDuration());
+        subTasks.add(subTask.getId());
+
+        if (subTask.getStartTime() == null) {
+            return;
+        }
+
+        if (startTime == null || subTask.getStartTime().isBefore(startTime)) {
+            startTime = subTask.getStartTime();
+        }
+
+        if (endTime == null || subTask.getEndTime().isAfter(endTime)) {
+            endTime = subTask.getEndTime();
+        }
     }
 
     public void updateSubTask(SubTask subTask) {
@@ -36,8 +53,25 @@ public class Epic extends Task {
         subTasks.add(subTask.getId());
     }
 
-    public void removeSubTask(Integer subTask) {
-        subTasks.remove(subTask);
+    public void deleteSubTask(SubTask subTask) {
+        subTasks.remove(Integer.valueOf(subTask.getId()));
+    }
+
+    public void setEndTime(LocalDateTime endTime) {
+        this.endTime = endTime;
+    }
+
+    public void setStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
+    }
+
+    public  void setDuration(Duration duration) {
+        this.duration = duration;
+    }
+
+    @Override
+    public LocalDateTime getEndTime() {
+        return endTime;
     }
 
     @Override

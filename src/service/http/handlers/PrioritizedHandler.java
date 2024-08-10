@@ -46,5 +46,5 @@ public class PrioritizedHandler extends BaseHttpHandler implements HttpHandler {
         return Endpoint.UNKNOWN;
     }
 
-    enum Endpoint {GET_LIST, UNKNOWN}
+    enum Endpoint { GET_LIST, UNKNOWN }
 }

@@ -172,5 +172,5 @@ public class EpicHandler extends BaseHttpHandler implements HttpHandler {
         }
     }
 
-    enum Endpoint {GET_EPICS, GET_EPIC, GET_SUBTASKS_OF_EPIC, CREATE_EPIC, DELETE_EPIC, UNKNOWN}
+    enum Endpoint { GET_EPICS, GET_EPIC, GET_SUBTASKS_OF_EPIC, CREATE_EPIC, DELETE_EPIC, UNKNOWN }
 }

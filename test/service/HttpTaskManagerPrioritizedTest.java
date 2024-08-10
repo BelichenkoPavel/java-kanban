@@ -52,9 +52,9 @@ public class HttpTaskManagerPrioritizedTest {
 
     @Test
     public void testGetPrioritizedList() throws IOException, InterruptedException {
-        Task task1 = new Task("Test 1", Status.NEW, "Description", Duration.ofHours(5), LocalDateTime.now());
-        Task task2 = new Task("Test 2", Status.NEW, "Description", Duration.ofHours(5), LocalDateTime.now().minusHours(10));
-        Task task3 = new Task("Test 3", Status.NEW, "Description", Duration.ofHours(5), LocalDateTime.now().minusHours(5));
+        Task task1 = new Task("Test 1", Status.NEW, "Description", Duration.ofHours(1), LocalDateTime.now());
+        Task task2 = new Task("Test 2", Status.NEW, "Description", Duration.ofHours(1), LocalDateTime.now().minusHours(2));
+        Task task3 = new Task("Test 3", Status.NEW, "Description", Duration.ofHours(1), LocalDateTime.now().minusHours(4));
 
         URI url = URI.create(baseUrl);
         HttpRequest requestEmptyList = HttpRequest.newBuilder().uri(url).GET().build();

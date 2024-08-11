@@ -6,6 +6,7 @@ import model.Status;
 import model.Task;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import service.http.HttpTaskServer;
 
@@ -30,7 +31,7 @@ public class HttpTaskManagerHistoryTest {
     TaskManager manager = new InMemoryTaskManager();
     // передаём его в качестве аргумента в конструктор HttpTaskServer
     HttpTaskServer taskServer = new HttpTaskServer(manager);
-    Gson gson = HttpTaskServer.getGson();
+    Gson gson = Managers.getGson();
     HttpClient client = HttpClient.newHttpClient();
     String baseUrl = "http://localhost:8080/history";
 
@@ -51,6 +52,7 @@ public class HttpTaskManagerHistoryTest {
     }
 
     @Test
+    @DisplayName("Получение истории")
     public void testGetHistoryList() throws IOException, InterruptedException {
         Task task1 = new Task("Test", Status.NEW, "Testing", Duration.ofHours(5), LocalDateTime.now());
         Task task2 = new Task("Test", Status.NEW, "Description", Duration.ofHours(5), LocalDateTime.now().plusHours(5));
@@ -83,6 +85,7 @@ public class HttpTaskManagerHistoryTest {
     }
 
     @Test
+    @DisplayName("Получение истории по несуществующему эндпоинту")
     public void testPost404() throws IOException, InterruptedException {
         URI url = URI.create(baseUrl);
         HttpRequest request = HttpRequest.newBuilder().uri(url).POST(HttpRequest.BodyPublishers.ofString("")).build();

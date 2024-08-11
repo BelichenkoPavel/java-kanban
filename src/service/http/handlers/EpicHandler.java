@@ -1,17 +1,13 @@
 package service.http.handlers;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import model.Epic;
 import model.SubTask;
+import service.Managers;
 import service.TaskManager;
-import service.http.HttpTaskServer;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,156 +17,76 @@ public class EpicHandler extends BaseHttpHandler implements HttpHandler {
     }
 
     @Override
-    public void handle(HttpExchange exchange) throws IOException {
-        String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
-        Endpoint endpoint = getEndpoint(exchange, body);
+    protected void processGetById(HttpExchange exchange) throws IOException {
+        Optional<Integer> id = getId(exchange);
 
-        switch (endpoint) {
-            case GET_EPIC: {
-                Optional<Integer> id = getId(exchange);
-
-                if (id.isEmpty()) {
-                    sendNotFound(exchange);
-                    return;
-                }
-
-                Epic epic = taskManager.getEpic(id.get());
-
-                if (epic == null) {
-                    sendNotFound(exchange);
-                    return;
-                }
-
-                try {
-                    String data = HttpTaskServer.getGson().toJson(epic);
-                    sendText(exchange, data);
-                } catch (Exception e) {
-                    sendInternalServerError(exchange, e);
-                    return;
-                }
-                break;
-            }
-            case GET_SUBTASKS_OF_EPIC: {
-                Optional<Integer> id = getId(exchange);
-
-                if (id.isEmpty()) {
-                    sendNotFound(exchange);
-                    return;
-                }
-
-                Epic epic = taskManager.getEpic(id.get());
-                List<SubTask> epicList = taskManager.getSubTasksOfEpic(epic);
-                try {
-                    String data = HttpTaskServer.getGson().toJson(epicList);
-                    sendText(exchange, data);
-                } catch (Exception e) {
-                    sendInternalServerError(exchange, e);
-                    return;
-                }
-                break;
-            }
-            case GET_EPICS: {
-                List<Epic> epicList = taskManager.getAllEpics();
-                try {
-                    String data = HttpTaskServer.getGson().toJson(epicList);
-                    sendText(exchange, data);
-                } catch (Exception e) {
-                    sendInternalServerError(exchange, e);
-                    return;
-                }
-                break;
-            }
-            case CREATE_EPIC: {
-                try {
-                    Epic epic = HttpTaskServer.getGson().fromJson(body, Epic.class);
-                    epic.initSubTasks();
-                    taskManager.createEpic(epic);
-                } catch (IllegalArgumentException e) {
-                    sendHasInteractions(exchange);
-                    return;
-                } catch (Exception e) {
-                    sendInternalServerError(exchange, e);
-                    return;
-                }
-                sendModify(exchange);
-                break;
-            }
-            case DELETE_EPIC: {
-                Optional<Integer> id = getId(exchange);
-
-                if (id.isEmpty()) {
-                    sendText(exchange, "");
-                    return;
-                }
-
-                try {
-                    taskManager.deleteEpic(id.get());
-                } catch (Exception e) {
-                    sendInternalServerError(exchange, e);
-                    return;
-                }
-                sendModify(exchange);
-                break;
-            }
-            default:
-                sendNotFound(exchange);
+        if (id.isEmpty()) {
+            sendNotFound(exchange);
+            return;
         }
+
+        Epic epic = taskManager.getEpic(id.get());
+
+        if (epic == null) {
+            sendNotFound(exchange);
+            return;
+        }
+
+        String data = Managers.getGson().toJson(epic);
+        sendText(exchange, data);
     }
 
-    private Endpoint getEndpoint(HttpExchange exchange, String body) throws IOException {
-        String requestPath = exchange.getRequestURI().getPath();
-        String requestMethod = exchange.getRequestMethod();
+    @Override
+    protected void processGetList(HttpExchange exchange) throws IOException {
+        List<Epic> epicList = taskManager.getAllEpics();
 
-        if (requestMethod.equals("DELETE")) {
-            return Endpoint.DELETE_EPIC;
-        }
-
-        if (requestMethod.equals("GET")) {
-            String[] requestPathParts = requestPath.split("/");
-
-            if (requestPathParts.length == 3) {
-                return Endpoint.GET_EPIC;
-            }
-
-            if (requestPathParts.length == 4) {
-                return Endpoint.GET_SUBTASKS_OF_EPIC;
-            }
-
-            return Endpoint.GET_EPICS;
-        }
-
-        if (requestMethod.equals("POST")) {
-            if (body.isEmpty()) {
-                return Endpoint.UNKNOWN;
-            }
-
-            JsonElement jsonElement = JsonParser.parseString(body);
-            JsonObject jsonObject = jsonElement.getAsJsonObject();
-            Optional<Integer> id = getIdFromJson(jsonObject);
-            if (id.isEmpty()) {
-                return Endpoint.CREATE_EPIC;
-            }
-        }
-
-        return Endpoint.UNKNOWN;
+        String data = Managers.getGson().toJson(epicList);
+        sendText(exchange, data);
     }
 
-    private Optional<Integer> getIdFromJson(JsonObject jsonObject) {
+    @Override
+    protected void processCreate(HttpExchange exchange, String body) throws IOException {
         try {
-            return Optional.of(jsonObject.get("id").getAsInt());
+            Epic epic = Managers.getGson().fromJson(body, Epic.class);
+            epic.initSubTasks();
+            taskManager.createEpic(epic);
+        } catch (IllegalArgumentException e) {
+            sendHasInteractions(exchange);
+            return;
+        }
+        sendModify(exchange);
+    }
+
+    @Override
+    protected void processGetSubtaskOfEpicList(HttpExchange exchange) throws IOException {
+        Optional<Integer> id = getId(exchange);
+
+        if (id.isEmpty()) {
+            sendNotFound(exchange);
+            return;
+        }
+
+        Epic epic = taskManager.getEpic(id.get());
+        List<SubTask> epicList = taskManager.getSubTasksOfEpic(epic);
+        String data = Managers.getGson().toJson(epicList);
+        sendText(exchange, data);
+    }
+
+    @Override
+    protected void processDelete(HttpExchange exchange) throws IOException {
+        Optional<Integer> id = getId(exchange);
+
+        if (id.isEmpty()) {
+            sendNotFound(exchange);
+            return;
+        }
+
+        try {
+            taskManager.deleteEpic(id.get());
         } catch (Exception e) {
-            return Optional.empty();
+            sendInternalServerError(exchange, e);
+            return;
         }
+        sendModify(exchange);
     }
-
-    private Optional<Integer> getId(HttpExchange exchange) {
-        String[] pathParts = exchange.getRequestURI().getPath().split("/");
-        try {
-            return Optional.of(Integer.parseInt(pathParts[2]));
-        } catch (NumberFormatException exception) {
-            return Optional.empty();
-        }
-    }
-
-    enum Endpoint { GET_EPICS, GET_EPIC, GET_SUBTASKS_OF_EPIC, CREATE_EPIC, DELETE_EPIC, UNKNOWN }
 }

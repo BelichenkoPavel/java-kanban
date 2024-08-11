@@ -7,6 +7,7 @@ import model.Epic;
 import model.SubTask;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import service.http.HttpTaskServer;
 
@@ -32,7 +33,7 @@ public class HttpTaskManagerEpicsTest {
     TaskManager manager = new InMemoryTaskManager();
     // передаём его в качестве аргумента в конструктор HttpTaskServer
     HttpTaskServer taskServer = new HttpTaskServer(manager);
-    Gson gson = HttpTaskServer.getGson();
+    Gson gson = Managers.getGson();
 
     String baseUrl = "http://localhost:8080/epics";
     HttpClient client = HttpClient.newHttpClient();
@@ -51,6 +52,7 @@ public class HttpTaskManagerEpicsTest {
     }
 
     @Test
+    @DisplayName("Добавить Эпик")
     public void testAddEpic() throws IOException, InterruptedException {
         // создаём json запрос эпика
         String epicJson = "{\"name\":\"Test\",\"description\":\"Testing task\"}";
@@ -72,6 +74,7 @@ public class HttpTaskManagerEpicsTest {
     }
 
     @Test
+    @DisplayName("Удалить Эпик")
     public void testDeleteEpic() throws IOException, InterruptedException {
         Epic epic = new Epic("Test", "Description");
         manager.createEpic(epic);
@@ -92,6 +95,7 @@ public class HttpTaskManagerEpicsTest {
     }
 
     @Test
+    @DisplayName("Получить список Эпиков")
     public void testGetEpicsList() throws IOException, InterruptedException {
         Epic task1 = new Epic("Test 1", "Description 1");
         Epic task2 = new Epic("Test 2", "Description 2");
@@ -112,6 +116,7 @@ public class HttpTaskManagerEpicsTest {
     }
 
     @Test
+    @DisplayName("Получить Эпик по id")
     public void testGetEpicById() throws IOException, InterruptedException {
         URI url = URI.create(baseUrl + "/" + 1);
         HttpRequest request = HttpRequest.newBuilder().uri(url).GET().build();
@@ -135,6 +140,7 @@ public class HttpTaskManagerEpicsTest {
     }
 
     @Test
+    @DisplayName("Получить список подзадач данного эпика")
     public void testGetSubTasksOfEpic() throws IOException, InterruptedException {
         Epic epic = new Epic("Test", "Description");
         manager.createEpic(epic);

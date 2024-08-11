@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import model.Status;
 import model.Task;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.AfterEach;
@@ -31,7 +32,7 @@ public class HttpTaskManagerTasksTest {
     TaskManager manager = new InMemoryTaskManager();
     // передаём его в качестве аргумента в конструктор HttpTaskServer
     HttpTaskServer taskServer = new HttpTaskServer(manager);
-    Gson gson = HttpTaskServer.getGson();
+    Gson gson = Managers.getGson();
 
     String baseUrl = "http://localhost:8080/tasks";
     HttpClient client = HttpClient.newHttpClient();
@@ -53,6 +54,7 @@ public class HttpTaskManagerTasksTest {
     }
 
     @Test
+    @DisplayName("Добавление задачи")
     public void testAddTask() throws IOException, InterruptedException {
         // создаём задачу
         String taskJson = "{\"name\":\"Test\",\"status\":\"NEW\",\"description\":\"Testing task 2\",\"duration\":\"PT5M\",\"startTime\":\"2024-08-10T01:06:50.4736799\"}";
@@ -83,6 +85,7 @@ public class HttpTaskManagerTasksTest {
     }
 
     @Test
+    @DisplayName("Обновление задачи")
     public void testUpdateTask() throws IOException, InterruptedException {
         Task task = new Task("Test", Status.NEW, "Description", Duration.ofHours(5), LocalDateTime.now());
         manager.createTask(task);
@@ -108,6 +111,7 @@ public class HttpTaskManagerTasksTest {
     }
 
     @Test
+    @DisplayName("Удаление задачи")
     public void testDeleteTask() throws IOException, InterruptedException {
         Task task = new Task("Test", Status.NEW, "Description", Duration.ofHours(5), LocalDateTime.now());
         manager.createTask(task);
@@ -128,6 +132,7 @@ public class HttpTaskManagerTasksTest {
     }
 
     @Test
+    @DisplayName("Получение списка задач")
     public void testGetTasksList() throws IOException, InterruptedException {
         Task task1 = new Task("Test", Status.NEW, "Description", Duration.ofHours(5), LocalDateTime.now());
         Task task2 = new Task("Test", Status.NEW, "Description", Duration.ofHours(5), LocalDateTime.now().plusHours(5));
@@ -148,6 +153,7 @@ public class HttpTaskManagerTasksTest {
     }
 
     @Test
+    @DisplayName("Получение задачи по id")
     public void testGetTaskById() throws IOException, InterruptedException {
         URI url = URI.create("http://localhost:8080/tasks/" + 1);
         HttpRequest request = HttpRequest.newBuilder().uri(url).GET().build();

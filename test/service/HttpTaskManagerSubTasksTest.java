@@ -7,6 +7,7 @@ import model.Status;
 import model.SubTask;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import service.http.HttpTaskServer;
 
@@ -32,7 +33,7 @@ public class HttpTaskManagerSubTasksTest {
     TaskManager manager = new InMemoryTaskManager();
     // передаём его в качестве аргумента в конструктор HttpTaskServer
     HttpTaskServer taskServer = new HttpTaskServer(manager);
-    Gson gson = HttpTaskServer.getGson();
+    Gson gson = Managers.getGson();
 
     String baseUrl = "http://localhost:8080/subtasks";
     HttpClient client = HttpClient.newHttpClient();
@@ -54,6 +55,7 @@ public class HttpTaskManagerSubTasksTest {
     }
 
     @Test
+    @DisplayName("Добавление подзадачи")
     public void testAddSubTask() throws IOException, InterruptedException {
         Epic epic = new Epic("Test", "Description");
         manager.createEpic(epic);
@@ -85,6 +87,7 @@ public class HttpTaskManagerSubTasksTest {
     }
 
     @Test
+    @DisplayName("Обновление подзадачи")
     public void testUpdateSubTask() throws IOException, InterruptedException {
         Epic epic = new Epic("Test", "Description");
         manager.createEpic(epic);
@@ -111,6 +114,7 @@ public class HttpTaskManagerSubTasksTest {
     }
 
     @Test
+    @DisplayName("Удаление подзадачи")
     public void testDeleteSubTask() throws IOException, InterruptedException {
         Epic epic = new Epic("Test", "Description");
         manager.createEpic(epic);
@@ -133,6 +137,7 @@ public class HttpTaskManagerSubTasksTest {
     }
 
     @Test
+    @DisplayName("Получение списка подзадач")
     public void testGetSubTasksList() throws IOException, InterruptedException {
         Epic epic = new Epic("Test", "Description");
         manager.createEpic(epic);
@@ -155,6 +160,7 @@ public class HttpTaskManagerSubTasksTest {
     }
 
     @Test
+    @DisplayName("Получение подзадачи по id")
     public void testGetSubTaskById() throws IOException, InterruptedException {
         URI url = URI.create(baseUrl + "/" + 2);
         HttpRequest request = HttpRequest.newBuilder().uri(url).GET().build();

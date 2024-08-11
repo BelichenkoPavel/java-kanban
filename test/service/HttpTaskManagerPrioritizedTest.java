@@ -6,6 +6,7 @@ import model.Status;
 import model.Task;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import service.http.HttpTaskServer;
 
@@ -30,7 +31,7 @@ public class HttpTaskManagerPrioritizedTest {
     TaskManager manager = new InMemoryTaskManager();
     // передаём его в качестве аргумента в конструктор HttpTaskServer
     HttpTaskServer taskServer = new HttpTaskServer(manager);
-    Gson gson = HttpTaskServer.getGson();
+    Gson gson = Managers.getGson();
     HttpClient client = HttpClient.newHttpClient();
     String baseUrl = "http://localhost:8080/prioritized";
 
@@ -51,6 +52,7 @@ public class HttpTaskManagerPrioritizedTest {
     }
 
     @Test
+    @DisplayName("Проверка получения списка задач в порядке приоритета")
     public void testGetPrioritizedList() throws IOException, InterruptedException {
         Task task1 = new Task("Test 1", Status.NEW, "Description", Duration.ofHours(1), LocalDateTime.now());
         Task task2 = new Task("Test 2", Status.NEW, "Description", Duration.ofHours(1), LocalDateTime.now().minusHours(2));
@@ -85,6 +87,7 @@ public class HttpTaskManagerPrioritizedTest {
     }
 
     @Test
+    @DisplayName("Попытка получения списка задач по несуществующему эндпоинту")
     public void testPost404() throws IOException, InterruptedException {
         URI url = URI.create(baseUrl);
         HttpRequest request = HttpRequest.newBuilder().uri(url).POST(HttpRequest.BodyPublishers.ofString("")).build();

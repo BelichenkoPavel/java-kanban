@@ -279,6 +279,10 @@ public class InMemoryTaskManager implements TaskManager {
 
     public void checkCollideByDate(Task task) {
         prioritizedTasks.stream().forEach((existTask) -> {
+            if (task.getId() == existTask.getId()) {
+                return;
+            }
+
             if (isTaskCollideByDate(existTask, task)) {
                 throw new IllegalArgumentException("Нельзя добавлять задачу с пересечением по времени");
             }

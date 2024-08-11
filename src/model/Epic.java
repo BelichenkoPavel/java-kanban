@@ -7,7 +7,7 @@ public class Epic extends Task {
 
     private LocalDateTime endTime;
 
-    private final ArrayList<Integer> subTasks = new ArrayList<>();
+    private ArrayList<Integer> subTasks = new ArrayList<>();
 
     public Epic(String name, String description) {
         super(name, Status.NEW, description);
@@ -25,6 +25,10 @@ public class Epic extends Task {
 
     public ArrayList<Integer> getSubTasks() {
         return subTasks;
+    }
+
+    public void initSubTasks() {
+        subTasks = new ArrayList<>();
     }
 
     public void addSubTask(SubTask subTask) {
@@ -45,10 +49,8 @@ public class Epic extends Task {
     }
 
     public void updateSubTask(SubTask subTask) {
-        for (Integer id : subTasks) {
-            if (id.equals(subTask.getId())) {
-                subTasks.remove(id);
-            }
+        if (subTasks.contains(subTask.getId())) {
+            subTasks.remove(Integer.valueOf(subTask.getId()));
         }
         subTasks.add(subTask.getId());
     }

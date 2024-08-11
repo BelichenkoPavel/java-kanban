@@ -162,6 +162,7 @@ public class BaseHttpHandler {
         h.getResponseBody().write(resp);
         h.close();
     }
+
     public void sendMethodNotAllowed(HttpExchange h) throws IOException {
         String message = "Method Not Allowed";
         byte[] resp = message.getBytes(StandardCharsets.UTF_8);
